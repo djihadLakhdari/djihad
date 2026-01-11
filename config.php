@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db = 'djihan';
+$db = 'djihad';
 $user = 'root';
 $pass = ''; 
 
@@ -10,4 +10,5 @@ try {
 } catch (PDOException $e) {
     die("فشل الاتصال: " . $e->getMessage());
 }
+
 ?>
