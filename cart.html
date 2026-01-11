@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>🛒 سلة التسوق</title>
+      <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<h2>🛒 سلة التسوق الخاصة بك</h2>
+
+<?php if (isset($_GET['updated'])): ?>
+    <div class="message">✅ تم تحديث الكمية بنجاح.</div>
+<?php elseif (isset($_GET['removed'])): ?>
+    <div class="message" style="color:red;">🗑️ تم حذف المنتج من السلة.</div>
+<?php endif; ?>
+
+<?php if (empty($items)): ?>
+    <p class="empty">🚫 لا توجد منتجات في السلة.</p>
+<?php else: ?>
+<table>
+    <tr>
+        <th>الصورة</th>
+        <th>الاسم</th>
+        <th>السعر</th>
+        <th>الكمية</th>
+        <th>المجموع</th>
+        <th>حذف</th>
+    </tr>
+    <?php foreach ($items as $item): 
+        $subtotal = $item['price'] * $item['quantity'];
+        $total += $subtotal;
+    ?>
+    <tr>
+        <td><img src="<?= htmlspecialchars($item['image']) ?>"></td>
+        <td><?= htmlspecialchars($item['name']) ?></td>
+        <td><?= $item['price'] ?> دج</td>
+        <td>
+            <form method="post" style="display: inline-flex; align-items: center;">
+                <input type="number" name="quantity" value="<?= $item['quantity'] ?>" min="1">
+                <input type="hidden" name="product_id" value="<?= $item['id'] ?>">
+                <button type="submit" name="update" class="update">🔁</button>
+            </form>
+        </td>
+        <td><?= $subtotal ?> دج</td>
+<td>
+    <button class="remove" onclick="removeFromCart(<?= $item['id'] ?>)">🗑</button>
+</td>
+    </tr>
+    <?php endforeach; ?>
+</table>
+
+<div class="total">المجموع الكلي: <?= $total ?> دج</div>
+<button class="checkout" onclick="window.location.href='checkout.php'">✅ إكمال الشراء</button>
+
+<?php endif; ?>
+<script>
+function removeFromCart(productId) {
+    if (confirm("❌ هل أنت متأكد من حذف المنتج؟")) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "delete_cart_item.php", true);
+        xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+
+        xhr.onload = function() {
+            if (xhr.status == 200 && xhr.responseText.trim() == "deleted") {
+             
+                location.reload();
+            } else {
+                alert("حدث خطأ أثناء حذف المنتج.");
+            }
+        }
+
+        xhr.send("product_id=" + productId);
+    }
+}
+</script>
+
+</body>
+</html>

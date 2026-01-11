@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8" />
+  <title>متجر جهاد لخضاري</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body dir="rtl">
+
+<nav>
+  <h1><i class="fas fa-store"></i> متجر جهاد لخضاري</h1>
+  <div>
+    <a href="index.php">الرئيسية</a>
+    <a href="cart.php">السلة (<span class="cart-count"><?= $cart_count ?></span>)</a>
+    <a href="favorite.php">مفضلتي</a>
+    <a href="logout.php">خروج</a>
+  </div>
+</nav>
+
+<div class="filters">
+  <strong>التصنيفات:</strong>
+  <?php foreach ($categories as $cat): ?>
+    <a href="?category=<?= $cat['id'] ?>" class="<?= ($category_id == $cat['id']) ? 'active' : '' ?>">
+      <?= htmlspecialchars($cat['name']) ?>
+    </a>
+  <?php endforeach; ?>
+</div>
+
+<?php if ($category_id && $brands): ?>
+<div class="filters">
+  <strong>الماركات:</strong>
+  <?php foreach ($brands as $b): ?>
+    <a href="?category=<?= $category_id ?>&brand=<?= urlencode($b['brand']) ?>">
+      <?= htmlspecialchars($b['brand']) ?>
+    </a>
+  <?php endforeach; ?>
+</div>
+<?php endif; ?>
+
+<div class="products-container">
+<?php foreach ($products as $product): ?>
+  <div class="product-card">
+    <form class="favorite-form" method="post">
+      <input type="hidden" name="product_id" value="<?= $product['id'] ?>">
+      <button>
+        <i class="fa<?= in_array($product['id'], $favorites) ? 's' : 'r' ?> fa-heart"></i>
+      </button>
+    </form>
+
+    <img src="<?= htmlspecialchars($product['image']) ?>">
+    <h3><?= htmlspecialchars($product['name']) ?></h3>
+<div class="info-row">
+  <a href="track_view.php?id=<?= $product['id'] ?>" class="details-btn">🔍 تفاصيل</a>
+  <button class="add-to-cart-btn" data-id="<?= $product['id'] ?>">🛒 أضف للسلة</button>
+</div>
+  </div>
+<?php endforeach; ?>
+</div>
+
+</body>
+</html>
+<script>/* favorites */
+document.querySelectorAll('.favorite-form').forEach(form => {
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    const heartIcon = form.querySelector('i');
+
+    fetch('toggle_favorite.php', {
+      method: 'POST',
+      body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'added') {
+        heartIcon.classList.remove('far');
+        heartIcon.classList.add('fas');
+        heartIcon.style.color = 'red';
+      } else if (data.status === 'removed') {
+        heartIcon.classList.remove('fas');
+        heartIcon.classList.add('far');
+        heartIcon.style.color = '#bbb';
+      }
+    });
+  });
+});
+
+/* add to cart */
+$(document).ready(function(){
+  $(".add-to-cart-btn").click(function(e){
+    e.preventDefault();
+    var product_id = $(this).data("id");
+
+    $.ajax({
+      url: "add_to_cart_ajax.php",
+      method: "POST",
+      data: { product_id: product_id },
+      dataType: "json",
+      success: function(response){
+        if(response.status === "success"){
+          $(".cart-count").text(response.cart_count);
+          alert("تمت إضافة المنتج للسلة");
+        }
+      }
+    });
+  });
+});
+</script>

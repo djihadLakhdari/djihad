@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>إتمام الطلب</title>
+      <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+<div class="checkout-container">
+  
+    <div class="form-box">
+        <h2>📦 معلومات الشحن والدفع</h2>
+        <form method="POST">
+            <label>الولاية:</label>
+            <input type="text" name="wilaya" required>
+
+            <label>البلدية:</label>
+            <input type="text" name="commune" required>
+
+            <label>العنوان الكامل:</label>
+            <textarea name="address" required></textarea>
+
+            <label>رقم الهاتف:</label>
+            <input type="text" name="phone" required>
+
+            <label>طريقة الدفع:</label>
+            <select name="payment" required>
+                <option value="الدفع عند الاستلام">الدفع عند الاستلام</option>
+               
+            </select>
+
+            <button type="submit" class="submit-btn">✅ تأكيد الطلب</button>
+        </form>
+    </div>
+
+    <div class="cart-box">
+        <h2>🛒 محتوى السلة</h2>
+        <?php $total = 0; foreach ($items as $item): ?>
+            <div class="cart-item">
+                <img src="<?= htmlspecialchars($item['image']) ?>" alt="<?= htmlspecialchars($item['name']) ?>">
+                <strong><?= htmlspecialchars($item['name']) ?></strong><br>
+                الكمية: <?= $item['quantity'] ?> <br>
+                السعر: <?= $item['price'] ?> دج
+            </div>
+            <?php $total += $item['price'] * $item['quantity']; ?>
+        <?php endforeach; ?>
+        <div class="total">المجموع النهائي: <?= $total ?> دج</div>
+    </div>
+</div>
+
+</body>
+</html>
